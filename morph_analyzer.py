@@ -2,6 +2,7 @@ import re
 import math
 import pymorphy2
 from collections import Counter
+from difflib import SequenceMatcher
 
 morph = pymorphy2.MorphAnalyzer()
 
@@ -16,12 +17,31 @@ def get_cosine(vec1, vec2):
     else:
         return float(numerator) / denominator
 
+def get_normal_form(word):
+    return morph.parse(word)[0].normal_form
+
 def text_to_vector(text):
     word = re.compile(r'\w+')
-    words = [morph.parse(x)[0].normal_form for x in word.findall(text)]
+    words = [get_normal_form(x) for x in word.findall(text)]
     return Counter(words)
 
-def get_text_similarity(text1, text2):
+def get_normalized_similarity_by_cosine(text1, text2):
     vector1 = text_to_vector(text1)
     vector2 = text_to_vector(text2)
     return get_cosine(vector1, vector2)
+
+def get_similarity_by_sequence_matcher(text1, text2):
+    return SequenceMatcher(None, text1, text2).ratio()
+
+def get_max_similarity(text1, text2):
+    return (max(get_normalized_similarity_by_cosine(text1, text2),
+                get_similarity_by_sequence_matcher(text1, text2)
+                ))
+
+def string_detection(text, string):
+    max_rate = get_max_similarity(text, string)
+    for word in text.split():
+        similarity = get_similarity_by_sequence_matcher(word, string)
+        if similarity > max_rate:
+            max_rate = similarity
+    return max_rate

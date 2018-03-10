@@ -62,5 +62,3 @@ class Employee(Base):
         return "<Employee(name='%s', surname='%s', patronymic='%s')>" % (
                 self.name, self.surname, self.patronymic)
 
-Employee.__table__
-Base.metadata.create_all(config.ENGINE)

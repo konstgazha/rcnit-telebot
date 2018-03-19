@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import create_engine
 
-TOKEN = ''
+TOKEN = '452236605:AAFbks6fWArCjiEXyvnmEfZjVPLt35FL-6c'
 
 SERVERS = ["sd.gov74.ru", "op-mon.pravmin74.ru", "sc.gov74.ru"]
 

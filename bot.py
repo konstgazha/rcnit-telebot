@@ -21,13 +21,29 @@ def get_organizations():
 def get_departments():
     return session.query(models.Department).all()
 
-def get_phone_book():
-    employees = session.query(models.Employee).all()
+def get_organization_by_name(name):
+    return session.query(models.Organization).\
+                   filter(models.Organization.name == name)
+
+def get_department_by_organization(organization):
+    return session.query(models.Department).\
+                   filter(models.Department.organization.any(id=organization.id))
+
+def get_department_by_name(name):
+    return session.query(models.Department).\
+                   filter(models.Department.title == name)
+
+def get_phone_book(department=None):
+    if department:
+        employees = session.query(models.Employee).\
+                            filter(models.Employee.department_id == department.id)
+    else:
+        employees = session.query(models.Employee).all()
     phone_book = ""
     for emp in employees:
         phone_book += "{0} {1} {2}\n".format(emp.name,
-                                           emp.surname,
-                                           emp.patronymic)
+                                             emp.surname,
+                                             emp.patronymic)
     return phone_book
 
 @bot.message_handler(commands=['start', 'help'])
@@ -43,6 +59,8 @@ def handle_ping(message):
 
 @bot.message_handler(commands=['phone'])
 def phone_book(message):
+    if message != '':
+        phone_book = get_phone_book()
     organizations = [org.name for org in get_organizations()]
     keyboard = telebot.types.InlineKeyboardMarkup()
     for org in organizations:
@@ -52,19 +70,27 @@ def phone_book(message):
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     if call.message:
-        organizations = [org.name for org in get_organizations()]
-        departments = [dep.title for dep in get_departments()]
-        if call.data in organizations:
+        organizations = get_organizations()
+        departments = get_departments()
+        organization_names = [org.name for org in organizations]
+        department_titles = [dep.title for dep in departments]
+        if call.data in organization_names:
+            organization = get_organization_by_name(call.data).first()
             keyboard = telebot.types.InlineKeyboardMarkup()
-            for dep in departments:
-                keyboard.add(telebot.types.InlineKeyboardButton(text=dep, callback_data=dep))
+            for dep in department_titles:
+                dep_by_org = get_department_by_organization(organization).first()
+                if dep_by_org:
+                    if dep == dep_by_org.title:
+                        keyboard.add(telebot.types.InlineKeyboardButton(text=dep, callback_data=dep))
             bot.edit_message_text(chat_id=call.message.chat.id,
                                   message_id=call.message.message_id,
                                   text="Выберите отдел",
                                   reply_markup=keyboard)
-        if call.data in departments:
+        if call.data in department_titles:
+            department = get_department_by_name(call.data).first()
+            text = get_phone_book(department)
             bot.edit_message_text(chat_id=call.message.chat.id,
                                   message_id=call.message.message_id,
-                                  text=get_phone_book())
+                                  text=text)
 if __name__ == '__main__':
     bot.polling(none_stop=True)

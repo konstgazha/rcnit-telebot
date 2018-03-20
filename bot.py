@@ -25,7 +25,7 @@ def get_organization_by_name(name):
     return session.query(models.Organization).\
                    filter(models.Organization.name == name)
 
-def get_department_by_organization(organization):
+def get_departments_by_organization(organization):
     return session.query(models.Department).\
                    filter(models.Department.organization.any(id=organization.id))
 
@@ -75,13 +75,13 @@ def callback_inline(call):
         organization_names = [org.name for org in organizations]
         department_titles = [dep.title for dep in departments]
         if call.data in organization_names:
-            organization = get_organization_by_name(call.data).first()
+            call_org = get_organization_by_name(call.data).first()
             keyboard = telebot.types.InlineKeyboardMarkup()
-            for dep in department_titles:
-                dep_by_org = get_department_by_organization(organization).first()
-                if dep_by_org:
-                    if dep == dep_by_org.title:
-                        keyboard.add(telebot.types.InlineKeyboardButton(text=dep, callback_data=dep))
+            dep_by_org = get_departments_by_organization(call_org).all()
+            for dep in departments:
+                if dep.title in [x.title for x in dep_by_org]:
+                    keyboard.add(telebot.types.InlineKeyboardButton(text=dep.title,
+                                                                    callback_data=dep.id))
             bot.edit_message_text(chat_id=call.message.chat.id,
                                   message_id=call.message.message_id,
                                   text="Выберите отдел",

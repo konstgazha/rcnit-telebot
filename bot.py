@@ -29,9 +29,9 @@ def get_departments_by_organization(organization):
     return session.query(models.Department).\
                    filter(models.Department.organization.any(id=organization.id))
 
-def get_department_by_name(name):
+def get_department_by_id(id):
     return session.query(models.Department).\
-                   filter(models.Department.title == name)
+                   filter(models.Department.id == id)
 
 def get_phone_book(department=None):
     if department:
@@ -73,7 +73,7 @@ def callback_inline(call):
         organizations = get_organizations()
         departments = get_departments()
         organization_names = [org.name for org in organizations]
-        department_titles = [dep.title for dep in departments]
+        department_ids = [dep.id for dep in departments]
         if call.data in organization_names:
             call_org = get_organization_by_name(call.data).first()
             keyboard = telebot.types.InlineKeyboardMarkup()
@@ -81,16 +81,20 @@ def callback_inline(call):
             for dep in departments:
                 if dep.title in [x.title for x in dep_by_org]:
                     keyboard.add(telebot.types.InlineKeyboardButton(text=dep.title,
-                                                                    callback_data=dep.id))
+                                                                    callback_data=config.DEPARTMENT_CODENAME + str(dep.id)))
             bot.edit_message_text(chat_id=call.message.chat.id,
                                   message_id=call.message.message_id,
                                   text="Выберите отдел",
                                   reply_markup=keyboard)
-        if call.data in department_titles:
-            department = get_department_by_name(call.data).first()
-            text = get_phone_book(department)
-            bot.edit_message_text(chat_id=call.message.chat.id,
-                                  message_id=call.message.message_id,
-                                  text=text)
+        if config.DEPARTMENT_CODENAME in call.data:
+            dep_id = int(call.data[len(config.DEPARTMENT_CODENAME):])
+            if dep_id in department_ids:
+                department = get_department_by_id(dep_id).first()
+                text = get_phone_book(department)
+                if not text:
+                    text = 'Список сотрудников пуст'
+                bot.edit_message_text(chat_id=call.message.chat.id,
+                                      message_id=call.message.message_id,
+                                      text=text)
 if __name__ == '__main__':
     bot.polling(none_stop=True)

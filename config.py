@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import create_engine
+from enum import Enum
 
 TOKEN = ''
 
@@ -18,3 +19,10 @@ ENGINE = create_engine('{0}://{1}:{2}@{3}/{4}'.format(DATABASE_ENGINE,
                                                       DATABASE_NAME))
 
 DEPARTMENT_CODENAME = 'dep'
+
+
+class States(Enum):
+    PHONEBOOK_START = "0"
+    PHONEBOOK_ORGANIZATION = "1"
+    PHONEBOOK_DEPARTMENT = "2"
+    PHONEBOOK_EMPLOYEE = "3"

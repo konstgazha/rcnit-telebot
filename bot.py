@@ -2,6 +2,7 @@
 import config
 import models
 import morph_analyzer
+import redis_manager
 import telebot
 import os
 from platform import system as system_name
@@ -61,11 +62,12 @@ def handle_ping(message):
 def phone_book(message):
     if message != '':
         phone_book = get_phone_book()
-    organizations = [org.name for org in get_organizations()]
+    organization_names = [org.name for org in get_organizations()]
     keyboard = telebot.types.InlineKeyboardMarkup()
-    for org in organizations:
+    for org in organization_names:
         keyboard.add(telebot.types.InlineKeyboardButton(text=org, callback_data=org))
     bot.send_message(message.chat.id, "Выберите организацию", reply_markup=keyboard)
+    redis_manager.set_state(message.chat.id, 'phone')
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
@@ -74,7 +76,18 @@ def callback_inline(call):
         departments = get_departments()
         organization_names = [org.name for org in organizations]
         department_ids = [dep.id for dep in departments]
-        if call.data in organization_names:
+        if call.data == 'phone':
+            keyboard = telebot.types.InlineKeyboardMarkup()
+            for org in organization_names:
+                keyboard.add(telebot.types.InlineKeyboardButton(text=org, callback_data=org))
+            bot.edit_message_text(chat_id=call.message.chat.id,
+                      message_id=call.message.message_id,
+                      text="Выберите организацию",
+                      reply_markup=keyboard)
+            redis_manager.set_state(call.message.chat.id, 'phone')
+        elif call.data in organization_names:
+            previous_state = redis_manager.get_current_state(call.message.chat.id)
+            redis_manager.set_state(call.message.chat.id, call.data)
             call_org = get_organization_by_name(call.data).first()
             keyboard = telebot.types.InlineKeyboardMarkup()
             dep_by_org = get_departments_by_organization(call_org).all()
@@ -82,17 +95,21 @@ def callback_inline(call):
                 if dep.title in [x.title for x in dep_by_org]:
                     keyboard.add(telebot.types.InlineKeyboardButton(text=dep.title,
                                                                     callback_data=config.DEPARTMENT_CODENAME + str(dep.id)))
+            keyboard.add(telebot.types.InlineKeyboardButton(text='Назад', callback_data=previous_state))
             bot.edit_message_text(chat_id=call.message.chat.id,
                                   message_id=call.message.message_id,
                                   text="Выберите отдел",
                                   reply_markup=keyboard)
-        if config.DEPARTMENT_CODENAME in call.data:
+        elif config.DEPARTMENT_CODENAME in call.data:
             dep_id = int(call.data[len(config.DEPARTMENT_CODENAME):])
             if dep_id in department_ids:
+                previous_state = redis_manager.get_current_state(call.message.chat.id)
+                redis_manager.set_state(call.message.chat.id, call.data)
                 department = get_department_by_id(dep_id).first()
                 text = get_phone_book(department)
                 if not text:
                     text = 'Список сотрудников пуст'
+                # keyboard.add(telebot.types.InlineKeyboardButton(text='Назад', callback_data=previous_state))
                 bot.edit_message_text(chat_id=call.message.chat.id,
                                       message_id=call.message.message_id,
                                       text=text)

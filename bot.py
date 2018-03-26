@@ -47,6 +47,12 @@ def get_phone_book(department=None):
                                              emp.patronymic)
     return phone_book
 
+def get_org_keyboard(organization_names):
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    for org in organization_names:
+        keyboard.add(telebot.types.InlineKeyboardButton(text=org, callback_data=org))
+    return keyboard
+
 @bot.message_handler(commands=['start', 'help'])
 def handle_start_help(message):
     bot.send_message(message.chat.id, 
@@ -63,9 +69,7 @@ def phone_book(message):
     if message != '':
         phone_book = get_phone_book()
     organization_names = [org.name for org in get_organizations()]
-    keyboard = telebot.types.InlineKeyboardMarkup()
-    for org in organization_names:
-        keyboard.add(telebot.types.InlineKeyboardButton(text=org, callback_data=org))
+    keyboard = get_org_keyboard(organization_names)
     bot.send_message(message.chat.id, "Выберите организацию", reply_markup=keyboard)
     redis_manager.set_state(message.chat.id, 'phone')
 
@@ -77,9 +81,7 @@ def callback_inline(call):
         organization_names = [org.name for org in organizations]
         department_ids = [dep.id for dep in departments]
         if call.data == 'phone':
-            keyboard = telebot.types.InlineKeyboardMarkup()
-            for org in organization_names:
-                keyboard.add(telebot.types.InlineKeyboardButton(text=org, callback_data=org))
+            keyboard = get_org_keyboard(organization_names)
             bot.edit_message_text(chat_id=call.message.chat.id,
                       message_id=call.message.message_id,
                       text="Выберите организацию",

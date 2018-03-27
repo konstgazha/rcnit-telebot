@@ -42,9 +42,10 @@ def get_phone_book(department=None):
         employees = session.query(models.Employee).all()
     phone_book = ""
     for emp in employees:
-        phone_book += "{0} {1} {2}\n".format(emp.name,
-                                             emp.surname,
-                                             emp.patronymic)
+        phone_book += "{0} {1} {2} {3}\n".format(emp.name,
+                                                 emp.surname,
+                                                 emp.patronymic,
+                                                 emp.phone_number)
     return phone_book
 
 def get_org_keyboard(organization_names):

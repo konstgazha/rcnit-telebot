@@ -53,6 +53,7 @@ class Employee(Base):
     name = Column(String)
     surname = Column(String)
     patronymic = Column(String)
+    phone_number = Column(String)
     position_id = Column(Integer, ForeignKey('position.id'))
     department_id = Column(Integer, ForeignKey('department.id'))
     date_added = Column(DateTime(timezone=True), server_default=func.now())

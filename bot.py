@@ -8,6 +8,7 @@ import os
 from platform import system as system_name
 from os import system as system_call
 from sqlalchemy.orm import sessionmaker
+import re
 
 session = sessionmaker(bind=config.ENGINE)()
 bot = telebot.TeleBot(config.TOKEN)
@@ -21,6 +22,9 @@ def get_organizations():
 
 def get_departments():
     return session.query(models.Department).all()
+
+def get_employees():
+    return session.query(models.Employee).all()
 
 def get_organization_by_name(name):
     return session.query(models.Organization).\
@@ -59,20 +63,34 @@ def handle_start_help(message):
     bot.send_message(message.chat.id, 
                      """Список доступных команд:
     /ping - статус серверов
-    /phone - телефонный справочник""")
+    /phonebook - телефонный справочник""")
 
 @bot.message_handler(commands=['ping'])
 def handle_ping(message):
     pass
 
 @bot.message_handler(commands=['phone'])
+def phone(message):
+    text = re.sub('/phone', '', message.text).strip()
+    if text:
+        employees = get_employees()
+        max_rate = 0
+        max_rated_emp = ''
+        for emp in employees:
+            rate = morph_analyzer.string_detection(emp.name, text)
+            if rate > max_rate:
+                max_rate = rate
+                max_rated_emp = emp.name
+        bot.send_message(message.chat.id, max_rated_emp)
+
+@bot.message_handler(commands=['phonebook'])
 def phone_book(message):
     if message != '':
         phone_book = get_phone_book()
     organization_names = [org.name for org in get_organizations()]
     keyboard = get_org_keyboard(organization_names)
     bot.send_message(message.chat.id, "Выберите организацию", reply_markup=keyboard)
-    redis_manager.set_state(message.chat.id, 'phone')
+    redis_manager.set_state(message.chat.id, 'phonebook')
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
@@ -81,13 +99,13 @@ def callback_inline(call):
         departments = get_departments()
         organization_names = [org.name for org in organizations]
         department_ids = [dep.id for dep in departments]
-        if call.data == 'phone':
+        if call.data == 'phonebook':
             keyboard = get_org_keyboard(organization_names)
             bot.edit_message_text(chat_id=call.message.chat.id,
                       message_id=call.message.message_id,
                       text="Выберите организацию",
                       reply_markup=keyboard)
-            redis_manager.set_state(call.message.chat.id, 'phone')
+            redis_manager.set_state(call.message.chat.id, 'phonebook')
         elif call.data in organization_names:
             previous_state = redis_manager.get_current_state(call.message.chat.id)
             redis_manager.set_state(call.message.chat.id, call.data)

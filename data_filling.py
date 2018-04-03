@@ -4,13 +4,13 @@ import random
 from sqlalchemy.orm import sessionmaker
 
 
-# models.Base.metadata.create_all(config.ENGINE)
+models.Base.metadata.create_all(config.ENGINE)
 
 session = sessionmaker(bind=config.ENGINE)()
 
 
 organization_names = ['ОГБУ ЧРЦНИТ', 'МИТИС']
-departments_titles = ['ПСИАС', 'Бухгалтерия', 'Администрация']
+departments_titles = ['ПСИАС', 'Бухгалтерия', 'Администрация', 'Тестовый отдел']
 position_titles = ['Главный специалист', 'Начальник']
 employee_names = ['Леонидова Яна Павеловна', 'Казакевича Изольда Давидовна',
                   'Смолина Антонина Игоревна', 'Клюев Глеб Агапович',
@@ -25,7 +25,10 @@ session.flush()
 
 dep_objs = []
 for dep in departments_titles:
-    dep_objs.append(models.Department(title=dep))
+    dep = models.Department(title=dep)
+    org = org_objs[random.randint(0, len(organization_names) - 1)]
+    dep.organization.append(org)
+    dep_objs.append(dep)
 
 session.add_all(dep_objs)
 session.flush()
@@ -48,8 +51,8 @@ for emp in employee_names:
                                     name=emp.split()[1],
                                     patronymic=emp.split()[2],
                                     phone_number=random.randint(100, 300),
-                                    department_id=department_ids[random.randint(0, len(departments_titles))],
-                                    position_id=position_ids[random.randint(0, len(position_titles))]))
+                                    department_id=department_ids[random.randint(0, len(departments) - 1)],
+                                    position_id=position_ids[random.randint(0, len(position_titles) - 1)]))
 
 session.add_all(emp_objs)
 session.flush()

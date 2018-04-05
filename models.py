@@ -6,15 +6,25 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
-organization_department_association = Table('organization_department', Base.metadata,
-    Column('organization_id', Integer, ForeignKey('organization.id')),
-    Column('department_id', Integer, ForeignKey('department.id'))
-)
+# organization_department_association = Table('organization_department', Base.metadata,
+#     Column('organization_id', Integer, ForeignKey('organization.id')),
+#     Column('department_id', Integer, ForeignKey('department.id'))
+# )
+class OrgDepAssociation(Base):
+    __tablename__ = 'org_dep_association'
+    id = Column(Integer, primary_key=True, unique=True)
+    org_id = Column(Integer, ForeignKey('organization.id'), primary_key=True)
+    dep_id = Column(Integer, ForeignKey('department.id'), primary_key=True)
+    employee = relationship("Employee")
+    # employee = relationship("Employee", secondary='employee')
+
 
 class Organization(Base):
     __tablename__ = 'organization'
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    department = relationship("Department", secondary='org_dep_association')
+    # department = relationship("Department", back_populates="organization")
     date_added = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -27,7 +37,8 @@ class Department(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     employee = relationship("Employee")
-    organization = relationship("Organization", secondary=organization_department_association)
+    organization = relationship("Organization", secondary='org_dep_association')
+    # organization = relationship("Organization", back_populates="department")
     date_added = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -55,7 +66,7 @@ class Employee(Base):
     patronymic = Column(String)
     phone_number = Column(String)
     position_id = Column(Integer, ForeignKey('position.id'))
-    department_id = Column(Integer, ForeignKey('department.id'))
+    org_dep_id = Column(Integer, ForeignKey('org_dep_association.id'))
     date_added = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -64,4 +75,4 @@ class Employee(Base):
                 self.name, self.surname, self.patronymic)
 
 
-# Base.metadata.create_all(config.ENGINE)
+Base.metadata.create_all(config.ENGINE)

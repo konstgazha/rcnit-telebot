@@ -31,7 +31,7 @@ class Department(Base):
     __tablename__ = 'department'
     id = Column(Integer, primary_key=True)
     title = Column(String)
-    employee = relationship("Employee")
+    # employee = relationship("Employee")
     org_dep_association = relationship("OrgDepAssociation")
     date_added = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), onupdate=func.now())

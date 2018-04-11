@@ -25,12 +25,17 @@ session.flush()
 
 dep_objs = []
 for dep in departments_titles:
-    dep = models.Department(title=dep)
-    org = org_objs[random.randint(0, len(organization_names) - 1)]
-    dep.organization.append(org)
-    dep_objs.append(dep)
+    dep_objs.append(models.Department(title=dep))
 
 session.add_all(dep_objs)
+session.flush()
+
+org_dep_objs = []
+for dep in dep_objs:
+    org = org_objs[random.randint(0, len(org_objs) - 1)]
+    org_dep_objs.append(models.OrgDepAssociation(organization_id=org.id,
+                                                 department_id=dep.id))
+session.add_all(org_dep_objs)
 session.flush()
 
 pos_objs = []
@@ -41,8 +46,7 @@ session.add_all(pos_objs)
 session.flush()
 session.commit()
 
-departments = session.query(models.Department).all()
-department_ids = [dep.id for dep in departments]
+org_dep_ids = [org_dep.id for org_dep in org_dep_objs]
 positions = session.query(models.Position).all()
 position_ids = [pos.id for pos in positions]
 emp_objs = []
@@ -51,7 +55,7 @@ for emp in employee_names:
                                     name=emp.split()[1],
                                     patronymic=emp.split()[2],
                                     phone_number=random.randint(100, 300),
-                                    department_id=department_ids[random.randint(0, len(departments) - 1)],
+                                    org_dep_id=org_dep_ids[random.randint(0, len(org_dep_ids) - 1)],
                                     position_id=position_ids[random.randint(0, len(position_titles) - 1)]))
 
 session.add_all(emp_objs)

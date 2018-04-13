@@ -30,9 +30,18 @@ def get_organization_by_name(name):
     return session.query(models.Organization).\
                    filter(models.Organization.name == name)
 
+def get_org_dep_by_id(_id):
+    return session.query(models.OrgDepAssociation).\
+                   filter(models.OrgDepAssociation.id == _id)
+
+def get_org_dep(organization, department):
+    return session.query(models.OrgDepAssociation).\
+                   filter(models.OrgDepAssociation.organization_id == organization.id,
+                          models.OrgDepAssociation.department_id == department.id).first()
+
 def get_departments_by_organization(organization):
     org_deps = session.query(models.OrgDepAssociation).\
-                      filter(models.OrgDepAssociation.organization_id == organization.id).all()
+                       filter(models.OrgDepAssociation.organization_id == organization.id).all()
     departments = []
     for org_dep in org_deps:
         departments.append(session.query(models.Department).\
@@ -43,10 +52,10 @@ def get_department_by_id(id):
     return session.query(models.Department).\
                    filter(models.Department.id == id)
 
-def get_phone_book(department=None):
-    if department:
+def get_phone_book(org_dep_id=None):
+    if org_dep_id:
         employees = session.query(models.Employee).\
-                            filter(models.Employee.department_id == department.id)
+                            filter(models.Employee.org_dep_id == org_dep_id)
     else:
         employees = session.query(models.Employee).all()
     phone_book = ""
@@ -119,20 +128,22 @@ def callback_inline(call):
             dep_by_org = get_departments_by_organization(call_org)
             for dep in departments:
                 if dep.title in [x.title for x in dep_by_org]:
+                    org_dep = get_org_dep(call_org, dep)
                     keyboard.add(telebot.types.InlineKeyboardButton(text=dep.title,
-                                                                    callback_data=config.DEPARTMENT_CODENAME + str(dep.id)))
+                                                                    callback_data=config.DEPARTMENT_CODENAME + str(org_dep.id)))
             keyboard.add(telebot.types.InlineKeyboardButton(text='Назад', callback_data=previous_state))
             bot.edit_message_text(chat_id=call.message.chat.id,
                                   message_id=call.message.message_id,
                                   text="Выберите отдел",
                                   reply_markup=keyboard)
         elif config.DEPARTMENT_CODENAME in call.data:
-            dep_id = int(call.data[len(config.DEPARTMENT_CODENAME):])
-            if dep_id in department_ids:
+            org_dep_id = int(call.data[len(config.DEPARTMENT_CODENAME):])
+            if org_dep_id in department_ids:
                 previous_state = redis_manager.get_current_state(call.message.chat.id)
                 redis_manager.set_state(call.message.chat.id, call.data)
-                department = get_department_by_id(dep_id).first()
-                text = get_phone_book(department)
+                # dep_org = get_org_dep_by_id(org_dep_id)
+                # department = get_department_by_id(dep_org.id).first()
+                text = get_phone_book(org_dep_id)
                 if not text:
                     text = 'Список сотрудников пуст'
                 # keyboard.add(telebot.types.InlineKeyboardButton(text='Назад', callback_data=previous_state))

@@ -31,8 +31,13 @@ def get_organization_by_name(name):
                    filter(models.Organization.name == name)
 
 def get_departments_by_organization(organization):
-    return session.query(models.Department).\
-                   filter(models.Department.organization.any(id=organization.id))
+    org_deps = session.query(models.OrgDepAssociation).\
+                      filter(models.OrgDepAssociation.organization_id == organization.id).all()
+    departments = []
+    for org_dep in org_deps:
+        departments.append(session.query(models.Department).\
+                                   filter(models.Department.id == org_dep.department_id).first())
+    return departments
 
 def get_department_by_id(id):
     return session.query(models.Department).\
@@ -111,7 +116,7 @@ def callback_inline(call):
             redis_manager.set_state(call.message.chat.id, call.data)
             call_org = get_organization_by_name(call.data).first()
             keyboard = telebot.types.InlineKeyboardMarkup()
-            dep_by_org = get_departments_by_organization(call_org).all()
+            dep_by_org = get_departments_by_organization(call_org)
             for dep in departments:
                 if dep.title in [x.title for x in dep_by_org]:
                     keyboard.add(telebot.types.InlineKeyboardButton(text=dep.title,

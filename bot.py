@@ -5,6 +5,7 @@ import morph_analyzer
 import redis_manager
 import telebot
 import os
+import numpy as np
 from platform import system as system_name
 from os import system as system_call
 from sqlalchemy.orm import sessionmaker
@@ -77,6 +78,7 @@ def handle_start_help(message):
     bot.send_message(message.chat.id, 
                      """Список доступных команд:
     /ping - статус серверов
+    /phone - телефон сотрудника
     /phonebook - телефонный справочник""")
 
 @bot.message_handler(commands=['ping'])
@@ -88,14 +90,18 @@ def phone(message):
     text = re.sub('/phone', '', message.text).strip()
     if text:
         employees = get_employees()
-        max_rate = 0
-        max_rated_emp = ''
+        emp_rates = []
         for emp in employees:
-            rate = morph_analyzer.string_detection(emp.name, text)
-            if rate > max_rate:
-                max_rate = rate
-                max_rated_emp = emp.name
-        bot.send_message(message.chat.id, max_rated_emp)
+            emp_rates.append(morph_analyzer.string_detection(emp.name + " " + emp.surname, text))
+        top_rated = np.argsort(emp_rates)[-3:]
+        for n in top_rated:
+            if emp_rates[n] > 0.6:
+                bot.send_message(message.chat.id, employees[n].name + " "
+                                 + employees[n].surname + " "
+                                 + employees[n].patronymic + " "
+                                 + str(employees[n].phone_number))
+                break
+        # bot.send_message(message.chat.id, "Нет подходящих контактов")
 
 @bot.message_handler(commands=['phonebook'])
 def phone_book(message):

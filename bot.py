@@ -93,15 +93,27 @@ def phone(message):
         emp_rates = []
         for emp in employees:
             emp_rates.append(morph_analyzer.string_detection(emp.name + " " + emp.surname, text))
-        top_rated = np.argsort(emp_rates)[-3:]
-        for n in top_rated:
-            if emp_rates[n] > 0.6:
-                bot.send_message(message.chat.id, employees[n].name + " "
-                                 + employees[n].surname + " "
-                                 + employees[n].patronymic + " "
-                                 + str(employees[n].phone_number))
-                break
-        # bot.send_message(message.chat.id, "Нет подходящих контактов")
+        n = np.argsort(emp_rates)[-1:][0]
+        if emp_rates[n] > 0.6:
+            bot.send_message(message.chat.id, employees[n].name + " "
+                             + employees[n].surname + " "
+                             + employees[n].patronymic + " "
+                             + str(employees[n].phone_number))
+        else:
+            indexes = np.argsort(emp_rates)[-3:]
+            similar_exists = False
+            for r in np.array(emp_rates)[indexes]:
+                if r > 0.5:
+                    similar_exists = True
+            if similar_exists and len(text) > 3:
+                bot.send_message(message.chat.id, "Наиболее подходящие контакты:")
+                for n in indexes:
+                    bot.send_message(message.chat.id, employees[n].name + " "
+                                     + employees[n].surname + " "
+                                     + employees[n].patronymic + " "
+                                     + str(employees[n].phone_number))
+            else:
+                bot.send_message(message.chat.id, "Нет подходящих контактов")
 
 @bot.message_handler(commands=['phonebook'])
 def phone_book(message):

@@ -11,6 +11,7 @@ from os import system as system_call
 from sqlalchemy.orm import sessionmaker
 import re
 
+
 session = sessionmaker(bind=config.ENGINE)()
 bot = telebot.TeleBot(config.TOKEN)
 
@@ -73,6 +74,12 @@ def get_org_keyboard(organization_names):
         keyboard.add(telebot.types.InlineKeyboardButton(text=org, callback_data=org))
     return keyboard
 
+def get_employee_info(obj):
+    return obj.name + " " \
+           + obj.surname + " " \
+           + obj.patronymic + "\talex" \
+           + str(obj.phone_number)
+
 @bot.message_handler(commands=['start', 'help'])
 def handle_start_help(message):
     bot.send_message(message.chat.id, 
@@ -95,10 +102,7 @@ def phone(message):
             emp_rates.append(morph_analyzer.string_detection(emp.name + " " + emp.surname, text))
         n = np.argsort(emp_rates)[-1:][0]
         if emp_rates[n] > 0.6:
-            bot.send_message(message.chat.id, employees[n].name + " "
-                             + employees[n].surname + " "
-                             + employees[n].patronymic + " "
-                             + str(employees[n].phone_number))
+            bot.send_message(message.chat.id, get_employee_info(employees[n]))
         else:
             indexes = np.argsort(emp_rates)[-3:]
             similar_exists = False
@@ -108,10 +112,7 @@ def phone(message):
             if similar_exists and len(text) > 3:
                 bot.send_message(message.chat.id, "Наиболее подходящие контакты:")
                 for n in indexes:
-                    bot.send_message(message.chat.id, employees[n].name + " "
-                                     + employees[n].surname + " "
-                                     + employees[n].patronymic + " "
-                                     + str(employees[n].phone_number))
+                    bot.send_message(message.chat.id, get_employee_info(employees[n]))
             else:
                 bot.send_message(message.chat.id, "Нет подходящих контактов")
 

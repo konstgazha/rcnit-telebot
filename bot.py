@@ -77,7 +77,7 @@ def get_org_keyboard(organization_names):
 def get_employee_info(obj):
     return obj.name + " " \
            + obj.surname + " " \
-           + obj.patronymic + "\talex" \
+           + obj.patronymic + "\t" \
            + str(obj.phone_number)
 
 @bot.message_handler(commands=['start', 'help'])
@@ -100,9 +100,10 @@ def phone(message):
         emp_rates = []
         for emp in employees:
             emp_rates.append(morph_analyzer.string_detection(emp.name + " " + emp.surname, text))
-        n = np.argsort(emp_rates)[-1:][0]
-        if emp_rates[n] > 0.6:
-            bot.send_message(message.chat.id, get_employee_info(employees[n]))
+        nearest = [idx for idx in np.argsort(x) if np.array(x)[idx] > 0.6]
+        if nearest:
+            for n in nearest:
+                bot.send_message(message.chat.id, get_employee_info(employees[n]))
         else:
             indexes = np.argsort(emp_rates)[-3:]
             similar_exists = False

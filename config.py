@@ -20,6 +20,9 @@ ENGINE = create_engine('{0}://{1}:{2}@{3}/{4}'.format(DATABASE_ENGINE,
 
 DEPARTMENT_CODENAME = 'dep'
 
+HIGH_RATE_EMPLOYEEE = 0.6
+AVERAGE_RATE_EMPLOYEEE = 0.5
+
 
 class States(Enum):
     PHONEBOOK_START = "0"

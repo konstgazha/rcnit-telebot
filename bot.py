@@ -100,7 +100,7 @@ def phone(message):
         emp_rates = []
         for emp in employees:
             emp_rates.append(morph_analyzer.string_detection(emp.name + " " + emp.surname, text))
-        nearest = [idx for idx in np.argsort(x) if np.array(x)[idx] > 0.6]
+        nearest = [idx for idx in np.argsort(x) if np.array(x)[idx] > config.HIGH_RATE_EMPLOYEEE]
         if nearest:
             for n in nearest:
                 bot.send_message(message.chat.id, get_employee_info(employees[n]))
@@ -108,7 +108,7 @@ def phone(message):
             indexes = np.argsort(emp_rates)[-3:]
             similar_exists = False
             for r in np.array(emp_rates)[indexes]:
-                if r > 0.5:
+                if r > config.AVERAGE_RATE_EMPLOYEEE:
                     similar_exists = True
             if similar_exists and len(text) > 3:
                 bot.send_message(message.chat.id, "Наиболее подходящие контакты:")

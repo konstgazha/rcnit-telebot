@@ -62,10 +62,7 @@ def get_phone_book(org_dep_id=None):
         employees = session.query(models.Employee).all()
     phone_book = ""
     for emp in employees:
-        phone_book += "{0} {1} {2} {3}\n".format(emp.name,
-                                                 emp.surname,
-                                                 emp.patronymic,
-                                                 emp.phone_number)
+        phone_book += get_employee_info(emp)
     return phone_book
 
 def get_org_keyboard(organization_names):
@@ -78,7 +75,7 @@ def get_employee_info(obj):
     return obj.name + " " \
            + obj.surname + " " \
            + obj.patronymic + "\t" \
-           + str(obj.phone_number)
+           + str(obj.phone_number) + "\n"
 
 @bot.message_handler(commands=['start', 'help'])
 def handle_start_help(message):
@@ -100,7 +97,7 @@ def phone(message):
         emp_rates = []
         for emp in employees:
             emp_rates.append(morph_analyzer.string_detection(emp.name + " " + emp.surname, text))
-        nearest = [idx for idx in np.argsort(x) if np.array(x)[idx] > config.HIGH_RATE_EMPLOYEEE]
+        nearest = [idx for idx in np.argsort(emp_rates) if np.array(emp_rates)[idx] > config.HIGH_RATE_EMPLOYEEE]
         if nearest:
             for n in nearest:
                 bot.send_message(message.chat.id, get_employee_info(employees[n]))

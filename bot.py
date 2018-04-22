@@ -123,6 +123,14 @@ def phone_book(message):
     bot.send_message(message.chat.id, "Выберите организацию", reply_markup=keyboard)
     redis_manager.set_state(message.chat.id, 'phonebook')
 
+def phonebook_handler(bot, message, organization_names):
+    keyboard = get_org_keyboard(organization_names)
+    bot.edit_message_text(chat_id=message.chat.id,
+                          message_id=message.message_id,
+                          text="Выберите организацию",
+                          reply_markup=keyboard)
+    redis_manager.set_state(message.chat.id, 'phonebook')
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     if call.message:
@@ -131,12 +139,7 @@ def callback_inline(call):
         organization_names = [org.name for org in organizations]
         department_ids = [dep.id for dep in departments]
         if call.data == 'phonebook':
-            keyboard = get_org_keyboard(organization_names)
-            bot.edit_message_text(chat_id=call.message.chat.id,
-                      message_id=call.message.message_id,
-                      text="Выберите организацию",
-                      reply_markup=keyboard)
-            redis_manager.set_state(call.message.chat.id, 'phonebook')
+            phonebook_handler(bot, call.message, organization_names)
         elif call.data in organization_names:
             previous_state = redis_manager.get_current_state(call.message.chat.id)
             redis_manager.set_state(call.message.chat.id, call.data)
@@ -158,12 +161,9 @@ def callback_inline(call):
             if org_dep_id in department_ids:
                 previous_state = redis_manager.get_current_state(call.message.chat.id)
                 redis_manager.set_state(call.message.chat.id, call.data)
-                # dep_org = get_org_dep_by_id(org_dep_id)
-                # department = get_department_by_id(dep_org.id).first()
                 text = get_phone_book(org_dep_id)
                 if not text:
                     text = 'Список сотрудников пуст'
-                # keyboard.add(telebot.types.InlineKeyboardButton(text='Назад', callback_data=previous_state))
                 bot.edit_message_text(chat_id=call.message.chat.id,
                                       message_id=call.message.message_id,
                                       text=text)

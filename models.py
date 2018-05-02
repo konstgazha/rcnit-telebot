@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 from sqlalchemy import Table, Column, Integer, String, DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
+from passlib.hash import bcrypt
 
 Base = declarative_base()
 
@@ -65,8 +66,25 @@ class Employee(Base):
     date_modified = Column(DateTime(timezone=True), onupdate=func.now())
 
     def __repr__(self):
-        return "<Employee(name='%s', surname='%s', patronymic='%s')>" % (
-                self.name, self.surname, self.patronymic)
+        return "<Employee(name='%s', surname='%s', patronymic='%s')>" % \
+                (self.name, self.surname, self.patronymic)
 
+
+class User(Base):
+    __tablename__ = 'user'
+    id = Column(Integer, primary_key=True)
+    username = Column(String(15), nullable=False, unique=True)
+    password = Column(String(300), nullable=False)
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = bcrypt.encrypt(password)
+
+    def validate_password(self, password):
+        return bcrypt.verify(password, self.password)
+
+    def __repr__(self):
+        return "<User(username ='%s', password='%s')>" % \
+                (self.username, self.password)
 
 Base.metadata.create_all(config.ENGINE)

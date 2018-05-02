@@ -80,10 +80,9 @@ def get_employee_info(obj):
 @bot.message_handler(commands=['start', 'help'])
 def handle_start_help(message):
     bot.send_message(message.chat.id, 
-                     """Список доступных команд:
-    /ping - статус серверов
-    /phone - телефон сотрудника
-    /phonebook - телефонный справочник""")
+                     "Список доступных команд:\
+                     \n/phone - телефон сотрудника (поиск по фамилии, имени)\
+                     \n/phonebook - телефонный справочник")
 
 @bot.message_handler(commands=['ping'])
 def handle_ping(message):

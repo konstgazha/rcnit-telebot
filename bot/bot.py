@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import sys
+sys.path.append('..')
 import config
 import models
-import morph_analyzer
 import redis_manager
+import morph_analyzer
 import telebot
 import os
 import numpy as np

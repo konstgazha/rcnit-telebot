@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import create_engine
-from enum import Enum
 
 TOKEN = ''
 
@@ -22,10 +21,3 @@ DEPARTMENT_CODENAME = 'dep'
 
 HIGH_RATE_EMPLOYEEE = 0.6
 AVERAGE_RATE_EMPLOYEEE = 0.5
-
-
-class States(Enum):
-    PHONEBOOK_START = "0"
-    PHONEBOOK_ORGANIZATION = "1"
-    PHONEBOOK_DEPARTMENT = "2"
-    PHONEBOOK_EMPLOYEE = "3"

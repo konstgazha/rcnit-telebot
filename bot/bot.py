@@ -10,58 +10,22 @@ import os
 import numpy as np
 from platform import system as system_name
 from os import system as system_call
-from sqlalchemy.orm import sessionmaker
+from models_handler import ModelsHandler
 import re
 
 
-session = sessionmaker(bind=config.ENGINE)()
+models_handler = ModelsHandler()
 bot = telebot.TeleBot(config.TOKEN)
 
 def ping(host):
     parameters = "-n 1" if system_name().lower() == "windows" else "-c 1"
     return system_call("ping " + parameters + " " + host) == 0
 
-def get_organizations():
-    return session.query(models.Organization).all()
-
-def get_departments():
-    return session.query(models.Department).all()
-
-def get_employees():
-    return session.query(models.Employee).all()
-
-def get_organization_by_name(name):
-    return session.query(models.Organization).\
-                   filter(models.Organization.name == name)
-
-def get_org_dep_by_id(_id):
-    return session.query(models.OrgDepAssociation).\
-                   filter(models.OrgDepAssociation.id == _id)
-
-def get_org_dep(organization, department):
-    return session.query(models.OrgDepAssociation).\
-                   filter(models.OrgDepAssociation.organization_id == organization.id,
-                          models.OrgDepAssociation.department_id == department.id).first()
-
-def get_departments_by_organization(organization):
-    org_deps = session.query(models.OrgDepAssociation).\
-                       filter(models.OrgDepAssociation.organization_id == organization.id).all()
-    departments = []
-    for org_dep in org_deps:
-        departments.append(session.query(models.Department).\
-                                   filter(models.Department.id == org_dep.department_id).first())
-    return departments
-
-def get_department_by_id(id):
-    return session.query(models.Department).\
-                   filter(models.Department.id == id)
-
 def get_phone_book(org_dep_id=None):
     if org_dep_id:
-        employees = session.query(models.Employee).\
-                            filter(models.Employee.org_dep_id == org_dep_id)
+        employees = models_handler.get_employees_by_org_dep_id(org_dep_id)
     else:
-        employees = session.query(models.Employee).all()
+        employees = models_handler.get_employees()
     phone_book = ""
     for emp in employees:
         phone_book += get_employee_info(emp)
@@ -94,7 +58,7 @@ def handle_ping(message):
 def phone(message):
     text = re.sub('/phone', '', message.text).strip()
     if text:
-        employees = get_employees()
+        employees = models_handler.get_employees()
         emp_rates = []
         for emp in employees:
             emp_rates.append(morph_analyzer.string_detection(emp.name + " " + emp.surname, text))
@@ -119,7 +83,7 @@ def phone(message):
 def phone_book(message):
     if message != '':
         phone_book = get_phone_book()
-    organization_names = [org.name for org in get_organizations()]
+    organization_names = [org.name for org in models_handler.get_organizations()]
     keyboard = get_org_keyboard(organization_names)
     bot.send_message(message.chat.id, "Выберите организацию", reply_markup=keyboard)
     redis_manager.set_state(message.chat.id, 'phonebook')
@@ -135,8 +99,8 @@ def phonebook_handler(bot, message, organization_names):
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     if call.message:
-        organizations = get_organizations()
-        departments = get_departments()
+        organizations = models_handler.get_organizations()
+        departments = models_handler.get_departments()
         organization_names = [org.name for org in organizations]
         department_ids = [dep.id for dep in departments]
         if call.data == 'phonebook':
@@ -144,12 +108,12 @@ def callback_inline(call):
         elif call.data in organization_names:
             previous_state = redis_manager.get_current_state(call.message.chat.id)
             redis_manager.set_state(call.message.chat.id, call.data)
-            call_org = get_organization_by_name(call.data).first()
+            call_org = models_handler.get_organization_by_name(call.data).first()
             keyboard = telebot.types.InlineKeyboardMarkup()
-            dep_by_org = get_departments_by_organization(call_org)
+            dep_by_org = models_handler.get_departments_by_organization(call_org)
             for dep in departments:
                 if dep.title in [x.title for x in dep_by_org]:
-                    org_dep = get_org_dep(call_org, dep)
+                    org_dep = models_handler.get_org_dep(call_org, dep)
                     keyboard.add(telebot.types.InlineKeyboardButton(text=dep.title,
                                                                     callback_data=config.DEPARTMENT_CODENAME + str(org_dep.id)))
             keyboard.add(telebot.types.InlineKeyboardButton(text='Назад', callback_data=previous_state))

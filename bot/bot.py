@@ -108,7 +108,7 @@ def callback_inline(call):
         elif call.data in organization_names:
             previous_state = redis_manager.get_current_state(call.message.chat.id)
             redis_manager.set_state(call.message.chat.id, call.data)
-            call_org = models_handler.get_organization_by_name(call.data).first()
+            call_org = models_handler.get_organization_by_name(call.data)
             keyboard = telebot.types.InlineKeyboardMarkup()
             dep_by_org = models_handler.get_departments_by_organization(call_org)
             for dep in departments:

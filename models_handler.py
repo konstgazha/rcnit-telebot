@@ -21,7 +21,7 @@ class ModelsHandler:
 
     def get_organization_by_name(self, name):
         return self.session.query(models.Organization).\
-                            filter(models.Organization.name == name)
+                            filter(models.Organization.name == name).first()
 
     def get_org_dep_by_id(self, _id):
         return self.session.query(models.OrgDepAssociation).\
@@ -44,3 +44,7 @@ class ModelsHandler:
     def get_department_by_id(self, _id):
         return self.session.query(models.Department).\
                             filter(models.Department.id == _id)
+
+    def get_organization_by_id(self, _id):
+        return self.session.query(models.Organization).\
+                            filter(models.Organization.id == _id)

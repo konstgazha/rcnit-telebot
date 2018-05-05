@@ -32,6 +32,10 @@ class ModelsHandler:
                             filter(models.OrgDepAssociation.organization_id == organization.id,
                                    models.OrgDepAssociation.department_id == department.id).first()
 
+    def get_org_deps_by_organization(self, organization):
+        return self.session.query(models.OrgDepAssociation).\
+                            filter(models.OrgDepAssociation.organization_id == organization.id).all()        
+
     def get_departments_by_organization(self, organization):
         org_deps = self.session.query(models.OrgDepAssociation).\
                                 filter(models.OrgDepAssociation.organization_id == organization.id).all()
@@ -48,3 +52,7 @@ class ModelsHandler:
     def get_organization_by_id(self, _id):
         return self.session.query(models.Organization).\
                             filter(models.Organization.id == _id)
+
+    def get_emps_by_org_dep(self, org_dep):
+        return self.session.query(models.Employee).\
+                            filter(models.Employee.org_dep_id == org_dep.id).all()

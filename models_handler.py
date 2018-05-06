@@ -36,18 +36,9 @@ class ModelsHandler:
         return self.session.query(models.OrgDepAssociation).\
                             filter(models.OrgDepAssociation.organization_id == organization.id).all()        
 
-    def get_departments_by_organization(self, organization):
-        org_deps = self.session.query(models.OrgDepAssociation).\
-                                filter(models.OrgDepAssociation.organization_id == organization.id).all()
-        departments = []
-        for org_dep in org_deps:
-            departments.append(self.session.query(models.Department).\
-                                            filter(models.Department.id == org_dep.department_id).first())
-        return departments
-
     def get_department_by_id(self, _id):
         return self.session.query(models.Department).\
-                            filter(models.Department.id == _id)
+                            filter(models.Department.id == _id).first()
 
     def get_organization_by_id(self, _id):
         return self.session.query(models.Organization).\
@@ -56,3 +47,15 @@ class ModelsHandler:
     def get_emps_by_org_dep(self, org_dep):
         return self.session.query(models.Employee).\
                             filter(models.Employee.org_dep_id == org_dep.id).all()
+
+    def get_position_by_id(self, _id):
+        return self.session.query(models.Position).\
+                            filter(models.Position.id == _id).first()
+
+    def get_departments_by_organization(self, organization):
+        org_deps = self.get_org_deps_by_organization(organization)
+        departments = []
+        for org_dep in org_deps:
+            departments.append(self.session.query(models.Department).\
+                                            filter(models.Department.id == org_dep.department_id).first())
+        return departments

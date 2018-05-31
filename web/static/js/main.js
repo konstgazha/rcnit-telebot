@@ -1,8 +1,12 @@
-$('.header a').click(function(){
+$('.header a').click(function() {
     $.getJSON($SCRIPT_ROOT + '/_get_org_phonebook', {
       org: $(this).text()
     }, function(data) {
-      var phonebook = document.createElement("TABLE");
+      var phonebook = document.getElementById('phonebook');
+      if (phonebook !== null) {
+        phonebook.remove();
+      }
+      phonebook = document.createElement("table");
       phonebook.setAttribute("id", "phonebook");
       document.body.appendChild(phonebook);
       for (var i = data.length - 1; i >= 0; i--) {
@@ -14,10 +18,6 @@ $('.header a').click(function(){
             let emp = document.createElement("tr");
             emp.className = "employees";
             document.getElementById("phonebook").appendChild(emp);
-            // let fullName = document.createElement("td");
-            // fullName.className = "full_name";
-            // emp.appendChild(fullName);
-            // fullName.innerHTML = getEmployeeFullName(data[i].emps[j]);
             appendTableCell(emp, "full_name", getEmployeeFullName(data[i].emps[j]));
             appendTableCell(emp, "position", data[i].emps[j].position);
             appendTableCell(emp, "phone_number", data[i].emps[j].phone_number);

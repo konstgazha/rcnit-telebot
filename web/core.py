@@ -5,11 +5,11 @@ import sys
 import json
 sys.path.append('..')
 from models_handler import ModelsHandler
-from models import Organization
+from models import Organization, Department, OrgDepAssociation, Position, Employee
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = ''
-admin = Admin(app)
+admin = Admin(app, template_mode='bootstrap3')
 db = ModelsHandler()
 
 @app.route('/')
@@ -39,3 +39,7 @@ def get_org_phonebook():
     return Response(json.dumps(phonebook), mimetype='application/json')
 
 admin.add_view(ModelView(Organization, db.session))
+admin.add_view(ModelView(Department, db.session))
+admin.add_view(ModelView(OrgDepAssociation, db.session))
+admin.add_view(ModelView(Position, db.session))
+admin.add_view(ModelView(Employee, db.session))

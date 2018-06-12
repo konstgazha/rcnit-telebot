@@ -13,44 +13,53 @@ class OrgDepAssociation(Base):
     id = Column(Integer, primary_key=True)
     organization_id = Column(Integer, ForeignKey('organization.id'))
     department_id = Column(Integer, ForeignKey('department.id'))
-    employee = relationship("Employee")
+    organization = relationship("Organization")
+    department = relationship("Department")
+
+    def __str__(self):
+        return "{} - {}".format(self.organization, self.department)
 
 
 class Organization(Base):
     __tablename__ = 'organization'
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    org_dep_association = relationship("OrgDepAssociation")
     date_added = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), onupdate=func.now())
 
     def __repr__(self):
         return "<Organization(name='%s')>" % self.name
 
+    def __str__(self):
+        return self.name
+
 
 class Department(Base):
     __tablename__ = 'department'
     id = Column(Integer, primary_key=True)
     title = Column(String)
-    # employee = relationship("Employee")
-    org_dep_association = relationship("OrgDepAssociation")
     date_added = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), onupdate=func.now())
 
     def __repr__(self):
         return "<Department(title='%s')>" % self.title
 
+    def __str__(self):
+        return self.title
+
 
 class Position(Base):
     __tablename__ = 'position'
     id = Column(Integer, primary_key=True)
     title = Column(String)
-    employee = relationship("Employee")
     date_added = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), onupdate=func.now())
 
     def __repr__(self):
         return "<Position(title='%s')>" % self.title
+
+    def __str__(self):
+        return self.title
 
 
 class Employee(Base):
@@ -64,10 +73,15 @@ class Employee(Base):
     org_dep_id = Column(Integer, ForeignKey('org_dep_association.id'))
     date_added = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), onupdate=func.now())
+    org_dep_association = relationship("OrgDepAssociation")
+    position = relationship("Position")
 
     def __repr__(self):
         return "<Employee(name='%s', surname='%s', patronymic='%s')>" % \
                 (self.name, self.surname, self.patronymic)
+
+    # def __str__(self):
+    #     return self.name, self.surname, self.patronymic
 
 
 class User(Base):

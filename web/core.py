@@ -1,16 +1,38 @@
-from flask import Flask, jsonify, render_template, request, Response
-from flask_admin import Admin
+from flask import Flask, jsonify, render_template, request, Response, redirect, url_for
+from flask_bootstrap import Bootstrap
+from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
+from flask_wtf import FlaskForm
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from wtforms import StringField, PasswordField, BooleanField
+from wtforms.validators import InputRequired, Length
 import sys
 import json
 sys.path.append('..')
 from models_handler import ModelsHandler
-from models import Organization, Department, OrgDepAssociation, Position, Employee
+from models import Organization, Department, OrgDepAssociation, Position, Employee, User
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = ''
-admin = Admin(app, template_mode='bootstrap3')
+app.config['SECRET_KEY'] = 'ar3r3'
+bootstrap = Bootstrap(app)
 db = ModelsHandler()
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.query(User).filter(User.id == int(user_id)).first()
+
+
+class LoginForm(FlaskForm):
+    username = StringField('username', validators=[InputRequired(), Length(min=4, max=16)])
+    password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=16)])
+    remember = BooleanField('remember me')
+
+    def get_user():
+        return db.session.query(User).filter(User.username == LoginForm.username.data).first()
 
 @app.route('/')
 def index():
@@ -38,8 +60,47 @@ def get_org_phonebook():
     models_handler.session.close()
     return Response(json.dumps(phonebook), mimetype='application/json')
 
-admin.add_view(ModelView(Organization, db.session))
-admin.add_view(ModelView(Department, db.session))
-admin.add_view(ModelView(OrgDepAssociation, db.session))
-admin.add_view(ModelView(Position, db.session))
-admin.add_view(ModelView(Employee, db.session))
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = db.session.query(User).filter(User.username == form.username.data).first()
+        if user:
+            if user.validate_password(form.password.data):
+                login_user(user, remember=form.remember.data)
+                return redirect(url_for('admin.index'))
+        return 'Invlid username or password'
+        # return '<h1>' + form.username.data + '</h1>'
+    return render_template('login.html', form=form)
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
+class CustomModelView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('login'))
+
+
+class CustomAdminIndexView(AdminIndexView):
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('login'))
+
+admin = Admin(app, index_view=CustomAdminIndexView(), template_mode='bootstrap3')
+admin.add_view(CustomModelView(Organization, db.session))
+admin.add_view(CustomModelView(Department, db.session))
+admin.add_view(CustomModelView(OrgDepAssociation, db.session))
+admin.add_view(CustomModelView(Position, db.session))
+admin.add_view(CustomModelView(Employee, db.session))
+admin.add_view(CustomModelView(User, db.session))
+
+if __name__ == '__main__':
+    app.run(debug=True)

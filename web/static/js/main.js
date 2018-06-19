@@ -24,6 +24,12 @@ $('.header a').click(function() {
           }
       }
     });
+    function createTableHead(table) {
+      let thead = document.createElement("thead");
+      table.appendChild(thead);
+      let tr = document.createElement("tr");
+
+    }
     function appendTableCell(row, className, value) {
       let cell = document.createElement("td");
       cell.className = className;

@@ -5,6 +5,7 @@ from sqlalchemy import Table, Column, Integer, String, DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from passlib.hash import bcrypt
+from flask_login import UserMixin
 
 Base = declarative_base()
 
@@ -69,6 +70,8 @@ class Employee(Base):
     surname = Column(String)
     patronymic = Column(String)
     phone_number = Column(String)
+    internal_phone_number = Column(String)
+    email = Column(String)
     position_id = Column(Integer, ForeignKey('position.id'))
     org_dep_id = Column(Integer, ForeignKey('org_dep_association.id'))
     date_added = Column(DateTime(timezone=True), server_default=func.now())
@@ -84,7 +87,7 @@ class Employee(Base):
     #     return self.name, self.surname, self.patronymic
 
 
-class User(Base):
+class User(Base, UserMixin):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     username = Column(String(15), nullable=False, unique=True)

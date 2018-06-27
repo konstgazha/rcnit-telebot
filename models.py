@@ -6,6 +6,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from passlib.hash import bcrypt
 from flask_login import UserMixin
+from sqlalchemy import event
 
 Base = declarative_base()
 
@@ -93,9 +94,9 @@ class User(Base, UserMixin):
     username = Column(String(15), nullable=False, unique=True)
     password = Column(String(300), nullable=False)
 
-    def __init__(self, username, password):
-        self.username = username
-        self.password = bcrypt.encrypt(password)
+    # def __init__(self, username, password):
+    #     self.username = username
+    #     self.password = bcrypt.encrypt(password)
 
     def validate_password(self, password):
         return bcrypt.verify(password, self.password)
@@ -103,5 +104,11 @@ class User(Base, UserMixin):
     def __repr__(self):
         return "<User(username ='%s', password='%s')>" % \
                 (self.username, self.password)
+
+
+@event.listens_for(User, 'init')
+def receive_init(target, args, kwargs):
+    target.password = bcrypt.encrypt(target.password)
+
 
 Base.metadata.create_all(config.ENGINE)

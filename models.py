@@ -106,9 +106,12 @@ class User(Base, UserMixin):
                 (self.username, self.password)
 
 
-@event.listens_for(User, 'init')
-def receive_init(target, args, kwargs):
+@event.listens_for(User, 'before_insert')
+def receive_before_insert(mapper, connection, target):
     target.password = bcrypt.encrypt(target.password)
 
+@event.listens_for(User, 'before_update')
+def receive_before_update(mapper, connection, target):
+    target.password = bcrypt.encrypt(target.password)
 
 Base.metadata.create_all(config.ENGINE)

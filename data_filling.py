@@ -59,10 +59,14 @@ for emp in employee_names:
                                     phone_number=phone_number,
                                     internal_phone_number=internal_phone_number,
                                     email="test@test.ru",
-                                    internal_phone_number=internal_phone_number,
                                     org_dep_id=org_dep_ids[random.randint(0, len(org_dep_ids) - 1)],
                                     position_id=position_ids[random.randint(0, len(position_titles) - 1)]))
 
 session.add_all(emp_objs)
+session.flush()
+session.commit()
+
+user = models.User(username="admin", password="qwerty123")
+session.add(user)
 session.flush()
 session.commit()

@@ -46,16 +46,22 @@ def get_org_phonebook():
     models_handler = ModelsHandler()
     org = models_handler.get_organization_by_name(request.args.get('org', ''))
     org_deps = models_handler.get_org_deps_by_organization(org)
-    phonebook = []
+    phonebook = {'header': ['Отдел',
+                            'ФИО',
+                            'Номер телефона',
+                            'Внутренний номер телефона',
+                            'Электронная почта',
+                            'Должность'],
+                 'data': []}
     for org_dep in org_deps:
         dep = models_handler.get_department_by_id(org_dep.department_id)
         emps = models_handler.get_emps_by_org_dep(org_dep)
-        emps = [{"name": emp.name,
-                 "surname": emp.surname,
-                 "patronymic": emp.patronymic,
+        emps = [{"full_name": str(emp),
                  "phone_number": emp.phone_number,
+                 "internal_phone_number": emp.internal_phone_number,
+                 "email": emp.email,
                  "position": models_handler.get_position_by_id(emp.position_id).title} for emp in emps]
-        phonebook.append({'dep': dep.title, 'emps': emps})
+        phonebook['data'].append({'dep': dep.title, 'emps': emps})
 
     models_handler.session.close()
     return Response(json.dumps(phonebook), mimetype='application/json')

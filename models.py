@@ -28,7 +28,7 @@ class Organization(Base):
     name = Column(String)
     date_added = Column(DateTime(timezone=True), server_default=func.now())
     date_modified = Column(DateTime(timezone=True), onupdate=func.now())
-
+    
     def __repr__(self):
         return "<Organization(name='%s')>" % self.name
 
@@ -84,8 +84,8 @@ class Employee(Base):
         return "<Employee(name='%s', surname='%s', patronymic='%s')>" % \
                 (self.name, self.surname, self.patronymic)
 
-    # def __str__(self):
-    #     return self.name, self.surname, self.patronymic
+    def __str__(self):
+        return "%s %s %s" % (self.surname, self.name, self.patronymic)
 
 
 class User(Base, UserMixin):

@@ -2,6 +2,7 @@ $('.header a').click(function() {
     $.getJSON($SCRIPT_ROOT + '/_get_org_phonebook', {
       org: $(this).text()
     }, function(content) {
+      console.log(content);
       var phonebook = document.getElementById('phonebook');
       if (phonebook !== null) {
         phonebook.remove();
@@ -11,17 +12,21 @@ $('.header a').click(function() {
       document.body.appendChild(phonebook);
       createTableHead(phonebook, content.header);
       for (var i = content.data.length - 1; i >= 0; i--) {
-          let dep = document.createElement("tr");
-          dep.className = "departments";
-          document.getElementById("phonebook").appendChild(dep);
-          dep.innerHTML = content.data[i].dep;
-          for (var j = content.data[i].emps.length - 1; j >= 0; j--) {
-            let emp = document.createElement("tr");
-            emp.className = "employees";
-            document.getElementById("phonebook").appendChild(emp);
-            appendTableCell(emp, "full_name", content.data[i].emps[j].full_name);
-            appendTableCell(emp, "position", content.data[i].emps[j].position);
-            appendTableCell(emp, "phone_number", content.data[i].emps[j].phone_number);
+          let depAdded = false;
+          let empNumber = content.data[i].emps.length;
+          for (var j = empNumber - 1; j >= 0; j--) {
+            let row = document.createElement("tr");
+            if (depAdded != true) {
+              appendDepartment(row, content.data[i].dep, empNumber);
+              depAdded = true;
+            }
+            //emp.className = "employees";
+            document.getElementById("phonebook").appendChild(row);
+            appendTableCell(row, "full_name", content.data[i].emps[j].full_name);
+            appendTableCell(row, "phone_number", content.data[i].emps[j].phone_number);
+            appendTableCell(row, "internal_phone_number", content.data[i].emps[j].internal_phone_number);
+            appendTableCell(row, "email", content.data[i].emps[j].email);
+            appendTableCell(row, "position", content.data[i].emps[j].position);
           }
       }
     });
@@ -42,5 +47,13 @@ $('.header a').click(function() {
       cell.className = className;
       row.appendChild(cell);
       cell.innerHTML = value;
+    }
+    function appendDepartment(row, department, rowspan) {
+      let dep = document.createElement("th");
+      dep.className = "department";
+      dep.setAttribute("rowspan", rowspan)//content.data[i].emps.length)
+      //document.getElementById("phonebook").appendChild(dep);
+      row.appendChild(dep);
+      dep.innerHTML = department; //content.data[i].dep;
     }
 });

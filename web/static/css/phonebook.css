@@ -7,17 +7,18 @@ body {
 }
 table {
   width: 100%;
-  max-width: 600px;
+  /*max-width: 600px;*/
   height: 320px;
   border-collapse: collapse;
   border: 1px solid #38678f;
   margin: 50px auto;
   background: white;
+  table-layout: fixed;
 }
 th {
   background: steelblue;
   height: 54px;
-  width: 25%;
+  /*width: 17%;*/
   font-weight: lighter;
   text-shadow: 0 1px 0 #38678f;
   color: white;
@@ -38,10 +39,6 @@ td {
 }
 td:last-child {
   border-right: 0px;
-}
-td.selected {
-  background: #d7e4ef;
-  z-index: ;
 }
 td input {
   font-size: 14px;
@@ -64,12 +61,13 @@ td input:focus {
   background: steelblue;
   color: white;
 }
-.phonebook {
+#phonebook {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   animation: float 5s infinite;
 }
-.main {
-  max-width: 600px;
+#main {
+  min-width: 900px;
+  max-width: 1200px;
   padding: 10px;
   margin: auto;
 }

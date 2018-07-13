@@ -2,14 +2,13 @@ $('.header a').click(function() {
     $.getJSON($SCRIPT_ROOT + '/_get_org_phonebook', {
       org: $(this).text()
     }, function(content) {
-      console.log(content);
       var phonebook = document.getElementById('phonebook');
       if (phonebook !== null) {
         phonebook.remove();
       }
       phonebook = document.createElement("table");
       phonebook.setAttribute("id", "phonebook");
-      document.body.appendChild(phonebook);
+      document.getElementById("main").appendChild(phonebook);
       createTableHead(phonebook, content.header);
       for (var i = content.data.length - 1; i >= 0; i--) {
           let depAdded = false;
@@ -20,7 +19,6 @@ $('.header a').click(function() {
               appendDepartment(row, content.data[i].dep, empNumber);
               depAdded = true;
             }
-            //emp.className = "employees";
             document.getElementById("phonebook").appendChild(row);
             appendTableCell(row, "full_name", content.data[i].emps[j].full_name);
             appendTableCell(row, "phone_number", content.data[i].emps[j].phone_number);

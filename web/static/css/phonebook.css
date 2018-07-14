@@ -3,6 +3,7 @@
 }
 body {
   background: steelblue;
+  /*background: #38678f;*/
   font-family: "Open Sans", arial;
 }
 table {
@@ -16,10 +17,15 @@ table {
   table-layout: fixed;
 }
 th {
+  border-right: 1px solid #cccccc;
+  padding: 10px;
+  transition: all 0.2s;
+  font-weight: lighter;
+}
+thead th {
   background: steelblue;
   height: 54px;
-  /*width: 17%;*/
-  font-weight: lighter;
+  
   text-shadow: 0 1px 0 #38678f;
   color: white;
   border: 1px solid #38678f;
@@ -40,15 +46,6 @@ td {
 td:last-child {
   border-right: 0px;
 }
-td input {
-  font-size: 14px;
-  background: none;
-  outline: none;
-  border: 0;
-  display: table-cell;
-  height: 100%;
-  width: 100%;
-}
 td input:focus {
   box-shadow: 0 1px 0 steelblue;
   color: steelblue;
@@ -60,6 +57,9 @@ td input:focus {
 ::selection {
   background: steelblue;
   color: white;
+}
+td a {
+  color: #3f75a2;
 }
 #phonebook {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -78,4 +78,42 @@ td input:focus {
 h1 {
   text-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   text-align: center;
+}
+button {
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  color: #fff;
+  position: relative;
+  letter-spacing: 0.1em;
+  font-weight: 400;
+  padding: 1rem 3rem 1rem 3rem;
+  text-transform: uppercase;
+  font-size: 1.2em;
+  border-radius: 5px;
+
+  font-weight: lighter;
+  text-shadow: 0 1px 0 #38678f;
+  border: 1px solid #38678f;
+  box-shadow: inset 0px 1px 2px #568ebd;
+  transition: all 0.2s;
+  background: steelblue;
+}
+button:hover {
+  background: #588ebb;
+}
+button:active{
+  background: #3f75a2;
+  box-shadow: inset 0px 1px 2px #386890;
+}
+button::-moz-focus-inner {
+  border: 0;
+}
+#header {
+  text-align: center;
+  margin-top: 50px;
+}
+#header button {
+  position: relative;
+  min-width: 250px;
 }

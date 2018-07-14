@@ -7,10 +7,9 @@
 </head>
 <body>
     <div id="main">
-      <div class="header">
-        Организации<br>
+      <div id="header">
         {% for org in orgs %}
-          <a href="#">{{ org.name }}</a>
+          <button>{{ org.name }}</button>
         {% endfor %}
       </div>
     </div>

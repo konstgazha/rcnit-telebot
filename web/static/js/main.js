@@ -1,4 +1,4 @@
-$('.header a').click(function() {
+$('#header button').click(function() {
     $.getJSON($SCRIPT_ROOT + '/_get_org_phonebook', {
       org: $(this).text()
     }, function(content) {
@@ -20,10 +20,11 @@ $('.header a').click(function() {
               depAdded = true;
             }
             document.getElementById("phonebook").appendChild(row);
+            let mailto = '<a href=mailto:"' + content.data[i].emps[j].email +'">' + content.data[i].emps[j].email + '</a>';
             appendTableCell(row, "full_name", content.data[i].emps[j].full_name);
             appendTableCell(row, "phone_number", content.data[i].emps[j].phone_number);
             appendTableCell(row, "internal_phone_number", content.data[i].emps[j].internal_phone_number);
-            appendTableCell(row, "email", content.data[i].emps[j].email);
+            appendTableCell(row, "email", mailto);
             appendTableCell(row, "position", content.data[i].emps[j].position);
           }
       }

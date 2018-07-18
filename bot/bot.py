@@ -8,12 +8,16 @@ import morph_analyzer
 import telebot
 import os
 import numpy as np
+import logging
 from platform import system as system_name
 from os import system as system_call
 from models_handler import ModelsHandler
 import re
+from telebot import apihelper
 
 
+logging.basicConfig(filename='bot.log', level=logging.INFO)
+apihelper.proxy = {'https':'socks5://47.75.31.98:1080'}
 models_handler = ModelsHandler()
 bot = telebot.TeleBot(config.TOKEN)
 
@@ -133,4 +137,7 @@ def callback_inline(call):
                                       message_id=call.message.message_id,
                                       text=text)
 if __name__ == '__main__':
-    bot.polling(none_stop=True)
+    try:
+        bot.polling(none_stop=True)
+    except Exception:
+        logging.warning(Exception)

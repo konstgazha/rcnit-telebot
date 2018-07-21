@@ -16,10 +16,16 @@ import re
 from telebot import apihelper
 
 
-logging.basicConfig(filename='bot.log', level=logging.INFO)
-apihelper.proxy = {'https':'socks5://47.75.31.98:1080'}
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%m-%d %H:%M',
+                    filename='bot.log',
+                    filemode='w')
+#apihelper.proxy = {'https':'socks5://47.75.31.98:1080'}
 models_handler = ModelsHandler()
 bot = telebot.TeleBot(config.TOKEN)
+logger = telebot.logger
+telebot.logger.setLevel(logging.DEBUG)
 
 def ping(host):
     parameters = "-n 1" if system_name().lower() == "windows" else "-c 1"
@@ -49,6 +55,7 @@ def get_employee_info(obj):
 
 @bot.message_handler(commands=['start', 'help'])
 def handle_start_help(message):
+    #logging.info(str(message.chat.id) + ' ' + message.text)
     bot.send_message(message.chat.id, 
                      "Список доступных команд:\
                      \n/phone - телефон сотрудника (поиск по фамилии, имени)\

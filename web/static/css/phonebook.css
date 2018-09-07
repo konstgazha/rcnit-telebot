@@ -5,11 +5,12 @@ body {
   background: steelblue;
   /*background: #38678f;*/
   font-family: "Open Sans", arial;
+  overflow-y: scroll;
 }
 table {
   width: 100%;
   /*max-width: 600px;*/
-  height: 320px;
+
   border-collapse: collapse;
   border: 1px solid #38678f;
   margin: 50px auto;
@@ -24,7 +25,7 @@ th {
 }
 thead th {
   background: steelblue;
-  height: 54px;
+  height: 54px !important;
   
   text-shadow: 0 1px 0 #38678f;
   color: white;
@@ -70,6 +71,10 @@ td a {
   max-width: 1200px;
   padding: 10px;
   margin: auto;
+}
+.email {
+  font-size: 12px;
+  word-break: break-all;
 }
 .content {
   color: white;

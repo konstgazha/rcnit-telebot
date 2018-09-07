@@ -11,9 +11,11 @@ import json
 sys.path.append('..')
 from models_handler import ModelsHandler
 from models import Organization, Department, OrgDepAssociation, Position, Employee, User
+from waitress import serve
+
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'ar3r3'
+app.config['SECRET_KEY'] = 'asd123'
 bootstrap = Bootstrap(app)
 db = ModelsHandler()
 login_manager = LoginManager()
@@ -47,11 +49,11 @@ def get_org_phonebook():
     org = models_handler.get_organization_by_name(request.args.get('org', ''))
     org_deps = models_handler.get_org_deps_by_organization(org)
     phonebook = {'header': ['Отдел',
+                            'Должность',
                             'ФИО',
                             'Номер телефона',
                             'Внутренний номер телефона',
-                            'Электронная почта',
-                            'Должность'],
+                            'Электронная почта'],
                  'data': []}
     for org_dep in org_deps:
         dep = models_handler.get_department_by_id(org_dep.department_id)
@@ -61,7 +63,8 @@ def get_org_phonebook():
                  "internal_phone_number": emp.internal_phone_number,
                  "email": emp.email,
                  "position": models_handler.get_position_by_id(emp.position_id).title} for emp in emps]
-        phonebook['data'].append({'dep': dep.title, 'emps': emps})
+        if emps:
+            phonebook['data'].append({'dep': dep.title, 'emps': emps})
 
     models_handler.session.close()
     return Response(json.dumps(phonebook), mimetype='application/json')
@@ -109,4 +112,4 @@ admin.add_view(CustomModelView(Employee, db.session))
 admin.add_view(CustomModelView(User, db.session))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    serve(app)

@@ -67,8 +67,8 @@ class Position(Base):
 class Employee(Base):
     __tablename__ = 'employee'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
     surname = Column(String)
+    name = Column(String)
     patronymic = Column(String)
     phone_number = Column(String)
     internal_phone_number = Column(String)

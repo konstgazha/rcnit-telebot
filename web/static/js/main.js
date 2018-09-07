@@ -1,58 +1,46 @@
-$('#header button').click(function() {
-    $.getJSON($SCRIPT_ROOT + '/_get_org_phonebook', {
-      org: $(this).text()
-    }, function(content) {
-      var phonebook = document.getElementById('phonebook');
-      if (phonebook !== null) {
-        phonebook.remove();
-      }
-      phonebook = document.createElement("table");
-      phonebook.setAttribute("id", "phonebook");
-      document.getElementById("main").appendChild(phonebook);
-      createTableHead(phonebook, content.header);
-      for (var i = content.data.length - 1; i >= 0; i--) {
-          let depAdded = false;
-          let empNumber = content.data[i].emps.length;
-          for (var j = empNumber - 1; j >= 0; j--) {
-            let row = document.createElement("tr");
-            if (depAdded != true) {
-              appendDepartment(row, content.data[i].dep, empNumber);
-              depAdded = true;
+$(document).ready(function(){
+  $('#header button').click(function() {
+    var ind = $(this).text();
+    if (window.tableAjax && ind in window.tableAjax) {
+      $('#phonebook').html(window.tableAjax[ind].html());
+    } else {
+      $.getJSON($SCRIPT_ROOT + '/_get_org_phonebook', {
+        org: ind
+      }, function(content) {
+        $('#phonebook').remove();
+        $('#main').append(phonebook = $('<table>').attr('id', 'phonebook'));
+        phonebook.append($('<thead>').append(tr = $('<tr>')));
+        $.each(content.header, function(){
+          tr.append($('<th>').text(this));
+        });
+        $.each(content.data, function(i){
+          let attr = {'class': 'department', 'rowspan': this.emps.length+1+''};
+          phonebook.append($('<tr>').append($('<th>').attr(attr).text(this.dep)));
+          $.each(this.emps, function(){
+            let emps = {
+              'position': this.position,
+              'full_name': this.full_name,
+              'phone_number': this.phone_number,
+              'internal_phone_number': this.internal_phone_number,
+              'email': this.email
+            }, tr = $('<tr>');
+            for (let key in emps) {
+              tr.append(function(){
+                let td = $('<span>').text(emps[key] || '');
+                if (key == 'email') {
+                  td = emps[key] ? $('<a>').attr('href', 'mailto: '+emps[key]).text(emps[key]) : '';
+                }
+                return $('<td>').attr('class', key).append(td);
+              });
             }
-            document.getElementById("phonebook").appendChild(row);
-            let mailto = '<a href=mailto:"' + content.data[i].emps[j].email +'">' + content.data[i].emps[j].email + '</a>';
-            appendTableCell(row, "full_name", content.data[i].emps[j].full_name);
-            appendTableCell(row, "phone_number", content.data[i].emps[j].phone_number);
-            appendTableCell(row, "internal_phone_number", content.data[i].emps[j].internal_phone_number);
-            appendTableCell(row, "email", mailto);
-            appendTableCell(row, "position", content.data[i].emps[j].position);
-          }
-      }
-    });
-    function createTableHead(table, header) {
-      console.log('tada');  
-      let thead = document.createElement("thead");
-      let tr = document.createElement("tr");
-      thead.appendChild(tr);
-      table.appendChild(thead);
-      for (var i = 0; i <= header.length - 1; i++) {
-        let th = document.createElement("th");
-        th.innerHTML = header[i];
-        tr.appendChild(th);
-      }
+            phonebook.append(tr);
+          });
+        });
+        if (!window.tableAjax)
+          window.tableAjax = {};
+        window.tableAjax[ind] = phonebook.clone();
+      });
     }
-    function appendTableCell(row, className, value) {
-      let cell = document.createElement("td");
-      cell.className = className;
-      row.appendChild(cell);
-      cell.innerHTML = value;
-    }
-    function appendDepartment(row, department, rowspan) {
-      let dep = document.createElement("th");
-      dep.className = "department";
-      dep.setAttribute("rowspan", rowspan)//content.data[i].emps.length)
-      //document.getElementById("phonebook").appendChild(dep);
-      row.appendChild(dep);
-      dep.innerHTML = department; //content.data[i].dep;
-    }
+  });
+  $('#header button:first-child').trigger('click');
 });

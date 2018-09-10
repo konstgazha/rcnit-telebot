@@ -3,8 +3,8 @@ $(document).ready(function(){
     var ind = $(this).text().trim();
     $('#phonebook').remove();
     if (window.tableAjax && ind in window.tableAjax) {
-      $('#searchBox').val('').trigger('oninput');
       $('#main').append($(window.tableAjax[ind]));
+      ogbu.search($('#searchBox').val());
     } else {
       $.getJSON($SCRIPT_ROOT + '/_get_org_phonebook', {
         org: ind
@@ -47,6 +47,7 @@ $(document).ready(function(){
         if (!window.tableAjax)
           window.tableAjax = {};
         window.tableAjax[ind] = phonebook.parent().clone();
+        ogbu.search($('#searchBox').val());
       });
     }
   });

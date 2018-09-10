@@ -15,9 +15,9 @@ $(document).ready(function(){
           tr.append($('<th>').text(this));
         });
         $.each(content.data, function(){
-          var dep = this.dep, tr;
+          var dep = this.dep;
           let attr = {'class': 'department', 'rowspan': this.emps.length+1+''}, firstRow = true;
-          phonebook.append(tr = $('<tr>').append($('<td>').attr(attr).text(dep)));
+          phonebook.append(tr = $('<tr>').append($('<td>').attr(attr).append($('<span>').text(dep))));
           $.each(this.emps, function(){
             let emps = {
               'position': this.position,
@@ -25,15 +25,13 @@ $(document).ready(function(){
               'phone_number': this.phone_number,
               'internal_phone_number': this.internal_phone_number,
               'email': this.email
-            }, trNew = $('<tr>').attr('dep', dep);
+            };
+            if (firstRow) {
+              tr = $('<tr>').attr('dep', dep);
+              phonebook.append(tr);
+            }
             for (let key in emps) {
-              $(function(firstRow){
-                if (arguments[0]) {
-                  return tr;
-                } else {
-                  return trNew;
-                }
-              }).append(function(){
+              $(tr).append(function(){
                 let span = $('<span>').text(emps[key] || '');
                 if (key == 'email') {
                   span = emps[key] ? $('<a>').attr('href', 'mailto: '+emps[key]).text(emps[key]) : '';

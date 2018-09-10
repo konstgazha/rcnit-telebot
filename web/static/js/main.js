@@ -16,7 +16,7 @@ $(document).ready(function(){
         });
         $.each(content.data, function(){
           var dep = this.dep;
-          let attr = {'class': 'department', 'rowspan': this.emps.length+1+''}, firstRow = true;
+          let attr = {'class': 'department', 'rowspan': this.emps.length+''}, firstRow = true;
           phonebook.append(tr = $('<tr>').append($('<td>').attr(attr).append($('<span>').text(dep))));
           $.each(this.emps, function(){
             let emps = {
@@ -26,7 +26,7 @@ $(document).ready(function(){
               'internal_phone_number': this.internal_phone_number,
               'email': this.email
             };
-            if (firstRow) {
+            if (!firstRow) {
               tr = $('<tr>').attr('dep', dep);
               phonebook.append(tr);
             }

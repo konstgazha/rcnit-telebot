@@ -2,20 +2,22 @@ $(document).ready(function(){
   $('#header button').click(function() {
     var ind = $(this).text();
     if (window.tableAjax && ind in window.tableAjax) {
-      $('#phonebook').html(window.tableAjax[ind].html());
+      $('#phonebook').remove();
+      $('#main').append($(window.tableAjax[ind]));
     } else {
       $.getJSON($SCRIPT_ROOT + '/_get_org_phonebook', {
         org: ind
       }, function(content) {
-        $('#phonebook').remove();
+        window.content = content;
         $('#main').append(phonebook = $('<table>').attr('id', 'phonebook'));
         phonebook.append($('<thead>').append(tr = $('<tr>')));
         $.each(content.header, function(){
           tr.append($('<th>').text(this));
         });
-        $.each(content.data, function(i){
-          let attr = {'class': 'department', 'rowspan': this.emps.length+1+''};
-          phonebook.append($('<tr>').append($('<th>').attr(attr).text(this.dep)));
+        $.each(content.data, function(){
+          var dep = this.dep;
+          let attr = {'class': 'department', 'rowspan': this.emps.length+1+''}, firstRow = true;
+          phonebook.append(tr = $('<tr>').append($('<td>').attr(attr).text(dep)));
           $.each(this.emps, function(){
             let emps = {
               'position': this.position,
@@ -23,17 +25,24 @@ $(document).ready(function(){
               'phone_number': this.phone_number,
               'internal_phone_number': this.internal_phone_number,
               'email': this.email
-            }, tr = $('<tr>');
+            }, trNew = $('<tr>');
             for (let key in emps) {
-              tr.append(function(){
-                let td = $('<span>').text(emps[key] || '');
-                if (key == 'email') {
-                  td = emps[key] ? $('<a>').attr('href', 'mailto: '+emps[key]).text(emps[key]) : '';
+              $(function(){
+                if (firstRow) {
+                  firstRow = false;
+                  return tr;
+                } else {
+                  phonebook.append(trNew);
+                  return trNew;
                 }
-                return $('<td>').attr('class', key).append(td);
-              });
+              }()).append(function(){
+                let span = $('<span>').text(emps[key] || '');
+                if (key == 'email') {
+                  span = emps[key] ? $('<a>').attr('href', 'mailto: '+emps[key]).text(emps[key]) : '';
+                }
+                return $('<td>').attr('class', key).append(span);
+              }).attr('dep', dep);
             }
-            phonebook.append(tr);
           });
         });
         if (!window.tableAjax)

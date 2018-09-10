@@ -12,8 +12,12 @@
           <button>{{ org.name }}</button>
         {% endfor %}
       </div>
+      <div class="searchBox">
+        <input id="searchBox" type="text" placeholder="ОГБУ.Поиск - найдется все!" oninput="ogbu.search($(this).val());">
+      </div>
     </div>
     <script type="text/javascript">$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};</script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/ogbu.js') }}"></script>
 </body>
 </html>

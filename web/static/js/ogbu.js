@@ -5,14 +5,13 @@
   }
 
   function search(text) {
-    console.log('test');
     let arr = [null, false];
-    $('tr').each(function(){
+    let tr = $('tbody tr');
+    tr.each(function(i){
       var dep = $(this).attr('dep');
       if (!arr[0]) {
         arr[0] = dep;
-      } else if (arr[0] != dep) {
-        debugger;
+      } else if (arr[0] != dep || i == tr.length-1) {
         let depList = '[dep="'+arr[0]+'"]';
         if (ogbu.search.result(arr[0], text)) {
           $(depList).show();

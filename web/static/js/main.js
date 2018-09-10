@@ -45,7 +45,7 @@ $(document).ready(function(){
         });
         if (!window.tableAjax)
           window.tableAjax = {};
-        window.tableAjax[ind] = phonebook.clone();
+        window.tableAjax[ind] = phonebook.parent().clone();
       });
     }
   });

@@ -10,15 +10,15 @@ $(document).ready(function(){
       }, function(content) {
         window.content = content;
         $('#main').append(phonebook = $('<table>').attr('id', 'phonebook'));
-        phonebook.append($('<thead>').append(tr = $('<tr>').append($('<tbody>'));
+        phonebook.append($('<thead>').append(tr = $('<tr>'))).append($('<tbody>'));
         phonebook = $('tbody');
         $.each(content.header, function(){
           tr.append($('<th>').text(this));
         });
         $.each(content.data, function(){
           var dep = this.dep;
-          let attr = {'class': 'department', 'rowspan': this.emps.length, 'dep': dep}, firstRow = true;
-          phonebook.append(tr = $('<tr>').append($('<td>').attr(attr).append($('<span>').text(dep))));
+          let attr = {'class': 'department', 'rowspan': this.emps.length}, firstRow = true;
+          phonebook.append(tr = $('<tr>').attr('dep', dep).append($('<td>').attr(attr).append($('<span>').text(dep))));
           $.each(this.emps, function(){
             let emps = {
               'position': this.position,

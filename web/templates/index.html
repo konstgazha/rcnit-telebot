@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Инофрмация о сотрудниках</title>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <title>Информация о сотрудниках</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/phonebook.css') }}">
 </head>
 <body>
@@ -12,8 +12,12 @@
           <button>{{ org.name }}</button>
         {% endfor %}
       </div>
+      <div class="searchBox">
+        <input id="searchBox" type="text" placeholder="ОГБУ.Поиск - найдется все!" oninput="ogbu.search($(this).val());">
+      </div>
     </div>
     <script type="text/javascript">$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};</script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/ogbu.js') }}"></script>
 </body>
 </html>

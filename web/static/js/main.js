@@ -27,8 +27,8 @@ $(document).ready(function(){
               'email': this.email
             }, trNew = $('<tr>').attr('dep', dep);
             for (let key in emps) {
-              $(function(){
-                if (firstRow) {
+              $(function(firstRow){
+                if (arguments[0]) {
                   return tr;
                 } else {
                   return trNew;

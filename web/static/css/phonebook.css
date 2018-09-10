@@ -135,3 +135,6 @@ button::-moz-focus-inner {
   border: 1px solid #38678f;
   box-shadow: inset 0px 1px 2px #568ebd;
 }
+.department {
+  text-align: center;
+}

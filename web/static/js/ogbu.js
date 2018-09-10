@@ -6,7 +6,8 @@
 
   function search(text) {
     let arr = [null, false];
-    $('tbody tr').each(function(){
+    $('tr').each(function(){
+      debugger;
       var dep = $(this).attr('dep');
       if (!arr[0]) {
         arr[0] = dep;
@@ -22,7 +23,7 @@
         arr[0] = null;
       }
       $('td', this).each(function(){
-        if (ogbu.seatch.result($(this).text(), text)) {
+        if (ogbu.search.result($(this).text(), text)) {
           arr[1] = true;
           ogbu.search.draw();
         } else {

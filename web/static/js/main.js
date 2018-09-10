@@ -25,11 +25,15 @@ $(document).ready(function(){
               'phone_number': this.phone_number,
               'internal_phone_number': this.internal_phone_number,
               'email': this.email
-            };
-            if (!firstRow) tr = $('<tr>').attr('dep', dep);
-            firstRow = false;
+            }, trNew = $('<tr>').attr('dep', dep);
             for (let key in emps) {
-              $(tr).append(function(){
+              $(function(){
+                if (firstRow) {
+                  return tr;
+                } else {
+                  return trNew;
+                }
+              }).append(function(){
                 let span = $('<span>').text(emps[key] || '');
                 if (key == 'email') {
                   span = emps[key] ? $('<a>').attr('href', 'mailto: '+emps[key]).text(emps[key]) : '';
@@ -37,6 +41,7 @@ $(document).ready(function(){
                 return $('<td>').attr('class', key).append(span);
               });
             }
+            firstRow = false;
           });
         });
         if (!window.tableAjax)

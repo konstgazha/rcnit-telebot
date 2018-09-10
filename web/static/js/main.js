@@ -3,6 +3,7 @@ $(document).ready(function(){
     var ind = $(this).text().trim();
     $('#phonebook').remove();
     if (window.tableAjax && ind in window.tableAjax) {
+      $('#searchBox').val('').trigger('oninput');
       $('#main').append($(window.tableAjax[ind]));
     } else {
       $.getJSON($SCRIPT_ROOT + '/_get_org_phonebook', {

@@ -3,6 +3,10 @@ $(document).ready(function(){
   $('#searchBox').on('input', function(){
     ogbu.search($(this).val());
   });
+  $('.searchBox .buttonDelete').click(function(){
+    $('#searchBox').val('');
+    ogbu.search('');
+  });
 });
 
 function getTable() {
@@ -60,7 +64,7 @@ function getTable() {
     let timer = [
       setInterval(function(){
         if ($('#phonebook').length || timer[1] == 10) {
-          clearInterval(timer);
+          clearInterval(timer[0]);
           ogbu.search($('#searchBox').val());
         }
         timer[1]++;

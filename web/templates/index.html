@@ -14,7 +14,12 @@
         {% endfor %}
       </div>
       <div class="searchBox">
-        <input id="searchBox" type="text" placeholder="ОГБУ.Поиск - найдется все!">
+        <div></div>
+        <div>
+          <input id="searchBox" type="text" placeholder="ОГБУ.Поиск - найдется все!">
+          <div class="buttonDelete"></div>
+        </div>
+        <div></div>
       </div>
     </div>
     <script type="text/javascript">$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};</script>

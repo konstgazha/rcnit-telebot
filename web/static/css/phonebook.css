@@ -1,11 +1,14 @@
 * {
   box-sizing: border-box;
+  line-height: 100%;
 }
 body {
   background: steelblue;
   /*background: #38678f;*/
   font-family: "Open Sans", arial;
   overflow-y: scroll;
+  padding: 0;
+  margin: 0;
 }
 table {
   width: 100%;
@@ -13,7 +16,8 @@ table {
 
   border-collapse: collapse;
   border: 1px solid #38678f;
-  margin: 50px auto;
+  margin: 0 auto;
+  margin-top: 50px;
   background: white;
   table-layout: fixed;
 }
@@ -69,8 +73,7 @@ td a {
 #main {
   min-width: 900px;
   max-width: 1200px;
-  padding: 10px;
-  margin: auto;
+  margin: 50px auto;
 }
 .email {
   font-size: 12px;
@@ -117,7 +120,6 @@ button::-moz-focus-inner {
 }
 #header {
   text-align: center;
-  margin-top: 50px;
 }
 #header button {
   position: relative;
@@ -126,19 +128,64 @@ button::-moz-focus-inner {
 .searchBox {
   margin-top: 50px;
   text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 #searchBox {
-  width: calc(100% / 1.5);
-  padding: 10px 0 10px 4vh;
+  width: calc(100% - 6.4vh);
   font-size: 2vh;
   outline: none;
-  border-radius: 5px;
-  border: 1px solid #38678f;
-  box-shadow: inset 0px 1px 2px #568ebd;
+  border: none;
+}
+.searchBox .buttonDelete {
+  width: 2.4vh;
+  height: 2.4vh;
+  display: inline-block;
+  background-color: none;
+  position: relative;
+  cursor: pointer;
+}
+.buttonDelete:before, .buttonDelete:after {
+  position: absolute;
+  content: ' ';
+  height: 2.4vh;
+  width: 4px;
+  background-color: lightgrey;
+  transition: background 0.5s;
+}
+.buttonDelete:before {
+  transform: rotate(45deg);
+}
+.buttonDelete:after {
+  transform: rotate(-45deg);
+}
+.searchBox .buttonDelete:hover:after,
+.searchBox .buttonDelete:hover:before {
+  background-color: #92959C;
 }
 .department {
   text-align: center;
 }
 .mark {
   background: gold;
+}
+.searchBox > div {
+  width: calc(100% / 6);
+  display: inline-block;
+}
+.searchBox > div:nth-child(2) {
+  width: calc(100% / 1.5);
+  padding: 10px 2.4vh 10px 4vh;
+  border-radius: 5px;
+  border: 1px solid #38678f;
+  background-color: white;
+  box-shadow: inset 0px 1px 2px #568ebd;
+  background-image: url("../img/lens.png");
+  background-repeat: no-repeat no-repeat;
+  background-size: 2.5vh auto;
+  background-position: .75vh center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

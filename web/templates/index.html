@@ -10,11 +10,11 @@
     <div id="main">
       <div id="header">
         {% for org in orgs %}
-          <button>{{ org.name }}</button>
+          <button onclick="getTable.call(this);">{{ org.name }}</button>
         {% endfor %}
       </div>
       <div class="searchBox">
-        <input id="searchBox" type="text" placeholder="ОГБУ.Поиск - найдется все!" oninput="ogbu.search($(this).val());">
+        <input id="searchBox" type="text" placeholder="ОГБУ.Поиск - найдется все!">
       </div>
     </div>
     <script type="text/javascript">$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};</script>

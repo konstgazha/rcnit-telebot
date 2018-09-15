@@ -1,10 +1,16 @@
 $(document).ready(function(){
-  $('#header button').click(function() {
+  $('#header button:first-child').trigger('click');
+  $('#searchBox').on('input', function(){
+    ogbu.search($(this).val());
+  });
+});
+
+function getTable() {
+  if (!$(this).hasClass('active')) {
     var ind = $(this).text().trim();
     $('#phonebook').remove();
     if (window.tableAjax && ind in window.tableAjax) {
       $('#main').append($(window.tableAjax[ind]));
-      ogbu.search($('#searchBox').val());
     } else {
       $.getJSON($SCRIPT_ROOT + '/_get_org_phonebook', {
         org: ind
@@ -36,7 +42,7 @@ $(document).ready(function(){
               $(tr).append(function(){
                 let span = $('<span>').text(emps[key] || '');
                 if (key == 'email') {
-                  span = emps[key] ? $('<a>').attr('href', 'mailto: '+emps[key]).text(emps[key]) : '';
+                  span = emps[key] ? $('<a>').attr('href', 'mailto: '+emps[key]).append($('<span>').text(emps[key])) : '';
                 }
                 return $('<td>').attr('class', key).append(span);
               });
@@ -47,9 +53,17 @@ $(document).ready(function(){
         if (!window.tableAjax)
           window.tableAjax = {};
         window.tableAjax[ind] = phonebook.parent().clone();
-        ogbu.search($('#searchBox').val());
       });
     }
-  });
-  $('#header button:first-child').trigger('click');
-});
+    $('.active').toggleClass('active');
+    $(this).toggleClass('active');
+    let timer = [
+      setInterval(function(){
+        if ($('#phonebook').length || timer[1] == 10) {
+          clearInterval(timer);
+          ogbu.search($('#searchBox').val());
+        }
+        timer[1]++;
+      }, 100), 0];
+  }
+};

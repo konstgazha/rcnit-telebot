@@ -1,65 +1,57 @@
 ;(function(){
 
+  jQuery.expr[":"].Contains = jQuery.expr.createPseudo(function(arg) {
+    return function( elem ) {
+      return jQuery(elem).text().toLowerCase().indexOf(arg.toLowerCase()) >= 0;
+    };
+  });
+
   function ogbu() {
 
   }
 
-  function search(text) {
-    let arr = [null, false];
-    let tr = $('tbody tr');
-    tr.each(function(i){
-      var dep = $(this).attr('dep');
-      $('td', this).each(function(){
-        if (ogbu.search.result($(this).text(), text)) {
-          arr[1] = true;
-          ogbu.search.draw();
-        } else {
-          ogbu.search.drawClear();
-        }
-      });
-      if (arr[1]) {
-        $(this).show();
-        arr[1] = false;
-      } else {
-        $(this).hide();
+  function search(str) {
+    let elems = $('tr:Contains("'+str+'")').show();
+    $('tbody tr:not(:Contains("'+str+'"))').hide();
+    $('.department').remove();
+    ogbu.eachFind(elems, str);
+  }
+
+  function eachFind(e, s) {
+    let dep;
+    ogbu.clearMark($('.mark').parent());
+    e.each(function(){
+      let tempDep = $(this).attr('dep');
+      if (dep != tempDep) {
+        let attr = {
+          'class': 'department',
+          'rowspan': $('[dep="'+tempDep+'"]:visible').length
+        };
+        $(this).prepend($('<td>').attr(attr).append($('<span>').text(tempDep)));
+        dep = tempDep;
       }
-      if (!arr[0]) {
-        arr[0] = dep;
-      } else if (arr[0] != dep || i == tr.length-1) {
-        let depList = '[dep="'+arr[0]+'"]';
-        if (ogbu.search.result(arr[0], text)) {
-          $(depList).show();
-        }
-        depList = $(depList+':visible');
-        let attr = {'class': 'department', 'rowspan': depList.length};
-        $('[dep="'+arr[0]+'"] .department').remove();
-        $(depList[0]).prepend($('<td>').attr(attr).text(arr[0]));
-        arr[0] = null;
-      }
+      ogbu.createMark($('span:Contains("'+s+'")', this), s);
     });
   }
 
-  function result(str, searchStr) {
-    if (str.trim().toLowerCase().search(searchStr.trim().toLowerCase()) > -1) {
-      return true;
-    } else {
-      return false;
-    }
+  function createMark(e, text) {
+    e.each(function(){
+      let t = $(this).text();
+      let str = t.substr(t.toLowerCase().indexOf(text.toLowerCase()), text.length);
+      $(this).html($(this).text().replace(str, '<span class="mark">'+str+'</span>'));
+    });
   }
 
-  function draw() {
-
+  function clearMark(e) {
+    e.each(function(){
+      $(this).html($(this).text());
+    });
   }
-
-  function drawClear() {
-    
-  }
-
-  search.result = result;
-  search.draw = draw;
-  search.drawClear = drawClear;
 
   ogbu.search = search;
+  ogbu.eachFind = eachFind;
+  ogbu.createMark = createMark;
+  ogbu.clearMark = clearMark;
 
   window.ogbu = ogbu;
 }());

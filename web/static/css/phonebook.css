@@ -104,10 +104,11 @@ button {
   transition: all 0.2s;
   background: steelblue;
 }
-button:hover {
+button:hover:not(.active) {
   background: #588ebb;
 }
-button:active{
+button:active,
+.active {
   background: #3f75a2;
   box-shadow: inset 0px 1px 2px #386890;
 }
@@ -137,4 +138,7 @@ button::-moz-focus-inner {
 }
 .department {
   text-align: center;
+}
+.mark {
+  background: gold;
 }
